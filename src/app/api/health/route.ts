@@ -34,6 +34,8 @@ export async function GET(req: NextRequest) {
           '/api/lists',
           '/api/tags',
           '/api/email/send',
+          '/api/extension/profile',
+          '/api/extension/company',
         ],
       },
     };
@@ -50,6 +52,18 @@ export async function GET(req: NextRequest) {
       { error: error.message }
     );
   }
+}
+
+/**
+ * HEAD endpoint for extension connectivity check
+ */
+export async function HEAD(req: NextRequest) {
+  return new Response(null, {
+    status: 200,
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
 }
 
 /**
