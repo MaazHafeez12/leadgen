@@ -12,6 +12,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '20');
     const search = searchParams.get('search') || '';
     const status = searchParams.get('status') || '';
+    const title = searchParams.get('title') || '';
     const company = searchParams.get('company') || '';
     const tag = searchParams.get('tag') || '';
 
@@ -29,6 +30,10 @@ export async function GET(request: NextRequest) {
 
     if (status) {
       query.status = status;
+    }
+
+    if (title) {
+      query.title = { $regex: title, $options: 'i' };
     }
 
     if (company) {

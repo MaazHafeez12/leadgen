@@ -34,6 +34,8 @@ export default function CompaniesPage() {
   const [industry, setIndustry] = useState('');
   const [location, setLocation] = useState('');
   const [size, setSize] = useState('');
+  const [tag, setTag] = useState('');
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
   const [pagination, setPagination] = useState<PaginationInfo>({
     page: 1,
     limit: 20,
@@ -44,7 +46,11 @@ export default function CompaniesPage() {
 
   useEffect(() => {
     fetchCompanies();
-  }, [pagination.page, search, industry, location, size]);
+  }, [pagination.page, search, industry, location, size, tag]);
+
+  useEffect(() => {
+    fetchAvailableTags();
+  }, []);
 
   const fetchCompanies = async () => {
     setLoading(true);
@@ -58,12 +64,13 @@ export default function CompaniesPage() {
       if (industry) params.append('industry', industry);
       if (location) params.append('location', location);
       if (size) params.append('size', size);
+      if (tag) params.append('tag', tag);
 
       const response = await fetch(`/api/companies?${params.toString()}`);
       const result = await response.json();
 
       if (result.success) {
-        setCompanies(result.data.companies || []);
+        setCompanies(result.data || []);
         if (result.pagination) {
           setPagination(result.pagination);
         }
@@ -72,6 +79,18 @@ export default function CompaniesPage() {
       console.error('Error fetching companies:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchAvailableTags = async () => {
+    try {
+      const response = await fetch('/api/tags');
+      const result = await response.json();
+      if (result.success && result.data) {
+        setAvailableTags(result.data.map((t: any) => t.name));
+      }
+    } catch (error) {
+      console.error('Error fetching tags:', error);
     }
   };
 
@@ -85,6 +104,7 @@ export default function CompaniesPage() {
     setIndustry('');
     setLocation('');
     setSize('');
+    setTag('');
     setPagination({ ...pagination, page: 1 });
   };
 
@@ -155,7 +175,7 @@ export default function CompaniesPage() {
 
           {/* Advanced Filters */}
           {showFilters && (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Industry
@@ -170,14 +190,14 @@ export default function CompaniesPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Location
+                  Location/Region
                 </label>
                 <input
                   type="text"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                   className="block w-full rounded-md border-0 py-2 px-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm"
-                  placeholder="e.g., San Francisco"
+                  placeholder="e.g., San Francisco, EU"
                 />
               </div>
               <div>
@@ -197,11 +217,38 @@ export default function CompaniesPage() {
                   ))}
                 </select>
               </div>
-              <div className="sm:col-span-3 flex justify-end">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Tag
+                </label>
+                <select
+                  value={tag}
+                  onChange={(e) => setTag(e.target.value)}
+                  className="block w-full rounded-md border-0 py-2 px-3 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm"
+                >
+                  <option value="">All Tags</option>
+                  {availableTags.map((t) => (
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="sm:col-span-2 lg:col-span-4 flex justify-between items-center">
+                <div className="text-sm text-gray-500">
+                  {(search || industry || location || size || tag) && (
+                    <span>
+                      {[search && 'search', industry && 'industry', location && 'location', size && 'size', tag && 'tag']
+                        .filter(Boolean)
+                        .length}{' '}
+                      filter(s) active
+                    </span>
+                  )}
+                </div>
                 <button
                   type="button"
                   onClick={clearFilters}
-                  className="text-sm text-gray-600 hover:text-gray-900"
+                  className="text-sm font-medium text-indigo-600 hover:text-indigo-900"
                 >
                   Clear all filters
                 </button>

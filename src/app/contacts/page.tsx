@@ -37,6 +37,11 @@ export default function ContactsPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('');
+  const [title, setTitle] = useState('');
+  const [companyFilter, setCompanyFilter] = useState('');
+  const [tag, setTag] = useState('');
+  const [companies, setCompanies] = useState<{ _id: string; name: string }[]>([]);
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
   const [pagination, setPagination] = useState<PaginationInfo>({
     page: 1,
     limit: 20,
@@ -47,7 +52,12 @@ export default function ContactsPage() {
 
   useEffect(() => {
     fetchContacts();
-  }, [pagination.page, search, status]);
+  }, [pagination.page, search, status, title, companyFilter, tag]);
+
+  useEffect(() => {
+    fetchCompanies();
+    fetchAvailableTags();
+  }, []);
 
   const fetchContacts = async () => {
     setLoading(true);
@@ -59,12 +69,15 @@ export default function ContactsPage() {
 
       if (search) params.append('search', search);
       if (status) params.append('status', status);
+      if (title) params.append('title', title);
+      if (companyFilter) params.append('company', companyFilter);
+      if (tag) params.append('tag', tag);
 
       const response = await fetch(`/api/contacts?${params.toString()}`);
       const result = await response.json();
 
       if (result.success) {
-        setContacts(result.data.contacts || []);
+        setContacts(result.data || []);
         if (result.pagination) {
           setPagination(result.pagination);
         }
@@ -76,6 +89,30 @@ export default function ContactsPage() {
     }
   };
 
+  const fetchCompanies = async () => {
+    try {
+      const response = await fetch('/api/companies?limit=1000');
+      const result = await response.json();
+      if (result.success && result.data) {
+        setCompanies(result.data);
+      }
+    } catch (error) {
+      console.error('Error fetching companies:', error);
+    }
+  };
+
+  const fetchAvailableTags = async () => {
+    try {
+      const response = await fetch('/api/tags');
+      const result = await response.json();
+      if (result.success && result.data) {
+        setAvailableTags(result.data.map((t: any) => t.name));
+      }
+    } catch (error) {
+      console.error('Error fetching tags:', error);
+    }
+  };
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setPagination({ ...pagination, page: 1 });
@@ -84,6 +121,9 @@ export default function ContactsPage() {
   const clearFilters = () => {
     setSearch('');
     setStatus('');
+    setTitle('');
+    setCompanyFilter('');
+    setTag('');
     setPagination({ ...pagination, page: 1 });
   };
 
@@ -154,7 +194,19 @@ export default function ContactsPage() {
 
           {/* Advanced Filters */}
           {showFilters && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Job Title
+                </label>
+                <input
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className="block w-full rounded-md border-0 py-2 px-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm"
+                  placeholder="e.g., CEO, CTO, Manager"
+                />
+              </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Status
@@ -172,11 +224,55 @@ export default function ContactsPage() {
                   ))}
                 </select>
               </div>
-              <div className="flex items-end">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Company
+                </label>
+                <select
+                  value={companyFilter}
+                  onChange={(e) => setCompanyFilter(e.target.value)}
+                  className="block w-full rounded-md border-0 py-2 px-3 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm"
+                >
+                  <option value="">All Companies</option>
+                  {companies.map((c) => (
+                    <option key={c._id} value={c._id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Tag
+                </label>
+                <select
+                  value={tag}
+                  onChange={(e) => setTag(e.target.value)}
+                  className="block w-full rounded-md border-0 py-2 px-3 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm"
+                >
+                  <option value="">All Tags</option>
+                  {availableTags.map((t) => (
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="sm:col-span-2 lg:col-span-4 flex justify-between items-center">
+                <div className="text-sm text-gray-500">
+                  {(search || status || title || companyFilter || tag) && (
+                    <span>
+                      {[search && 'search', status && 'status', title && 'title', companyFilter && 'company', tag && 'tag']
+                        .filter(Boolean)
+                        .length}{' '}
+                      filter(s) active
+                    </span>
+                  )}
+                </div>
                 <button
                   type="button"
                   onClick={clearFilters}
-                  className="text-sm text-gray-600 hover:text-gray-900"
+                  className="text-sm font-medium text-indigo-600 hover:text-indigo-900"
                 >
                   Clear all filters
                 </button>
