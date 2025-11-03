@@ -2,12 +2,19 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import {
+  ListBulletIcon,
+  PlusIcon,
+  TrashIcon,
+} from '@heroicons/react/24/outline';
 
 interface List {
   _id: string;
   name: string;
   description?: string;
   leads: any[];
+  contacts: any[];
+  companies: any[];
   createdAt: string;
 }
 
@@ -59,27 +66,27 @@ export default function ListsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Lead Lists</h1>
-          <div className="flex gap-4">
-            <button
-              onClick={() => setShowCreateForm(!showCreateForm)}
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              {showCreateForm ? 'Cancel' : '+ Create List'}
-            </button>
-            <Link
-              href="/"
-              className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition-colors"
-            >
-              Back to Home
-            </Link>
-          </div>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="sm:flex sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Lead Lists</h1>
+          <p className="mt-1 text-sm text-gray-500">
+            Organize contacts into custom groups for outreach and tracking
+          </p>
         </div>
+        <div className="mt-4 sm:mt-0">
+          <button
+            onClick={() => setShowCreateForm(!showCreateForm)}
+            className="inline-flex items-center gap-x-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500"
+          >
+            <PlusIcon className="h-5 w-5" />
+            {showCreateForm ? 'Cancel' : 'Create List'}
+          </button>
+        </div>
+      </div>
 
-        {/* Create Form */}
+      {/* Create Form */}
         {showCreateForm && (
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Create New List</h2>
@@ -142,28 +149,47 @@ export default function ListsPage() {
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {lists.map((list) => (
-              <Link
+              <div
                 key={list._id}
-                href={`/lists/${list._id}`}
                 className="bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition-shadow"
               >
-                <div className="flex items-start justify-between mb-4">
-                  <h3 className="text-xl font-semibold text-gray-900">{list.name}</h3>
-                  <span className="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full">
-                    {list.leads.length} leads
-                  </span>
-                </div>
-                {list.description && (
-                  <p className="text-gray-600 mb-4 line-clamp-2">{list.description}</p>
-                )}
-                <div className="text-sm text-gray-500">
-                  Created {new Date(list.createdAt).toLocaleDateString()}
-                </div>
-              </Link>
+                <Link href={`/lists/${list._id}`}>
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <ListBulletIcon className="h-6 w-6 text-indigo-600" />
+                      <h3 className="text-xl font-semibold text-gray-900 hover:text-indigo-600">
+                        {list.name}
+                      </h3>
+                    </div>
+                  </div>
+                  {list.description && (
+                    <p className="text-gray-600 mb-4 line-clamp-2">{list.description}</p>
+                  )}
+                  <div className="flex gap-4 mb-4">
+                    {list.contacts && list.contacts.length > 0 && (
+                      <span className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">
+                        {list.contacts.length} contact{list.contacts.length !== 1 ? 's' : ''}
+                      </span>
+                    )}
+                    {list.companies && list.companies.length > 0 && (
+                      <span className="inline-flex items-center rounded-full bg-green-50 px-3 py-1 text-sm font-medium text-green-700">
+                        {list.companies.length} compan{list.companies.length !== 1 ? 'ies' : 'y'}
+                      </span>
+                    )}
+                    {list.leads && list.leads.length > 0 && (
+                      <span className="inline-flex items-center rounded-full bg-purple-50 px-3 py-1 text-sm font-medium text-purple-700">
+                        {list.leads.length} lead{list.leads.length !== 1 ? 's' : ''}
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    Created {new Date(list.createdAt).toLocaleDateString()}
+                  </div>
+                </Link>
+              </div>
             ))}
           </div>
         )}
-      </div>
     </div>
   );
 }

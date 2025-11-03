@@ -7,7 +7,9 @@ import {
   PlusIcon,
   UserGroupIcon,
   FunnelIcon,
+  ListBulletIcon,
 } from '@heroicons/react/24/outline';
+import AddToListDialog from '@/components/AddToListDialog';
 
 interface Contact {
   _id: string;
@@ -49,6 +51,8 @@ export default function ContactsPage() {
     pages: 0,
   });
   const [showFilters, setShowFilters] = useState(false);
+  const [selectedContacts, setSelectedContacts] = useState<string[]>([]);
+  const [showAddToList, setShowAddToList] = useState(false);
 
   useEffect(() => {
     fetchContacts();
@@ -127,6 +131,27 @@ export default function ContactsPage() {
     setPagination({ ...pagination, page: 1 });
   };
 
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedContacts(contacts.map((c) => c._id));
+    } else {
+      setSelectedContacts([]);
+    }
+  };
+
+  const handleSelectContact = (contactId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedContacts([...selectedContacts, contactId]);
+    } else {
+      setSelectedContacts(selectedContacts.filter((id) => id !== contactId));
+    }
+  };
+
+  const handleAddToListSuccess = () => {
+    setSelectedContacts([]);
+    // Optionally refresh contacts
+  };
+
   const statusOptions = ['new', 'contacted', 'qualified', 'unqualified', 'converted'];
 
   const statusColors: Record<string, string> = {
@@ -147,7 +172,16 @@ export default function ContactsPage() {
             Manage your contact database
           </p>
         </div>
-        <div className="mt-4 sm:mt-0">
+        <div className="mt-4 sm:mt-0 flex gap-2">
+          {selectedContacts.length > 0 && (
+            <button
+              onClick={() => setShowAddToList(true)}
+              className="inline-flex items-center gap-x-2 rounded-md bg-white px-4 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+            >
+              <ListBulletIcon className="h-5 w-5" />
+              Add to List ({selectedContacts.length})
+            </button>
+          )}
           <Link
             href="/contacts/new"
             className="inline-flex items-center gap-x-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500"
@@ -319,6 +353,14 @@ export default function ContactsPage() {
             <table className="min-w-full divide-y divide-gray-300">
               <thead className="bg-gray-50">
                 <tr>
+                  <th className="px-3 py-3 text-left">
+                    <input
+                      type="checkbox"
+                      checked={selectedContacts.length === contacts.length && contacts.length > 0}
+                      onChange={(e) => handleSelectAll(e.target.checked)}
+                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                    />
+                  </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Name
                   </th>
@@ -345,6 +387,14 @@ export default function ContactsPage() {
               <tbody className="bg-white divide-y divide-gray-200">
                 {contacts.map((contact) => (
                   <tr key={contact._id} className="hover:bg-gray-50">
+                    <td className="px-3 py-4 whitespace-nowrap">
+                      <input
+                        type="checkbox"
+                        checked={selectedContacts.includes(contact._id)}
+                        onChange={(e) => handleSelectContact(contact._id, e.target.checked)}
+                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                      />
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <Link
                         href={`/contacts/${contact._id}`}
@@ -451,6 +501,14 @@ export default function ContactsPage() {
           </div>
         </div>
       )}
+
+      {/* Add to List Dialog */}
+      <AddToListDialog
+        isOpen={showAddToList}
+        onClose={() => setShowAddToList(false)}
+        selectedContactIds={selectedContacts}
+        onSuccess={handleAddToListSuccess}
+      />
     </div>
   );
 }

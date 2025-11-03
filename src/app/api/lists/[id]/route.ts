@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import List from '@/models/List';
 import Lead from '@/models/Lead';
+import Contact from '@/models/Contact';
 
-// GET /api/lists/[id] - Get a single list with leads
+// GET /api/lists/[id] - Get a single list with leads, contacts, and companies
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -11,7 +12,13 @@ export async function GET(
   try {
     await connectDB();
 
-    const list = await List.findById(params.id).populate('leads');
+    const list = await List.findById(params.id)
+      .populate('leads')
+      .populate({
+        path: 'contacts',
+        populate: { path: 'company' }
+      })
+      .populate('companies');
 
     if (!list) {
       return NextResponse.json(
