@@ -1,0 +1,9 @@
+First Name,Last Name,Email,Phone,Title,Company Name,LinkedIn URL,Location,Status,Tags
+John,Doe,john.doe@acme.com,+1-555-0101,CEO,Acme Corporation,https://linkedin.com/in/johndoe,San Francisco CA,qualified,"decision-maker,hot-lead"
+Jane,Smith,jane.smith@techco.io,+1-555-0102,CTO,TechCo Inc,https://linkedin.com/in/janesmith,New York NY,contacted,"technical,influencer"
+Bob,Johnson,bob@digitalsolutions.com,+1-555-0103,Founder,Digital Solutions Ltd,https://linkedin.com/in/bobjohnson,Austin TX,new,"founder,marketing"
+Alice,Williams,alice.w@enterprisesys.com,+1-555-0104,VP of Sales,Enterprise Systems,https://linkedin.com/in/alicewilliams,Boston MA,qualified,"sales,enterprise"
+Charlie,Brown,charlie@innovatelabs.io,+1-555-0105,Lead Researcher,InnovateLabs,https://linkedin.com/in/charliebrown,Seattle WA,new,"researcher,technical"
+David,Lee,david.lee@globalconsult.com,+1-555-0106,Managing Partner,Global Consulting Group,https://linkedin.com/in/davidlee,Chicago IL,contacted,"partner,decision-maker"
+Emma,Davis,emma@acme.com,+1-555-0107,VP of Product,Acme Corporation,https://linkedin.com/in/emmadavis,San Francisco CA,qualified,"product,technical"
+Frank,Miller,frank.m@techco.io,+1-555-0108,Head of Engineering,TechCo Inc,https://linkedin.com/in/frankmiller,New York NY,new,"engineering,technical"

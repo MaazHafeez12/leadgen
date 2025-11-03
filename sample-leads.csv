@@ -1,0 +1,5 @@
+First Name,Last Name,Email,Company,Title,Phone,Industry,Location,Website,LinkedIn URL
+John,Doe,john.doe@example.com,Acme Corporation,CEO,+1-555-0101,Technology,San Francisco CA,https://acme.com,https://linkedin.com/in/johndoe
+Jane,Smith,jane.smith@techco.io,TechCo,CTO,+1-555-0102,SaaS,New York NY,https://techco.io,https://linkedin.com/in/janesmith
+Bob,Johnson,bob@startup.com,Startup Inc,Founder,+1-555-0103,E-commerce,Austin TX,https://startup.com,https://linkedin.com/in/bobjohnson
+Alice,Williams,alice.w@consulting.com,Consulting Group,Partner,+1-555-0104,Consulting,Boston MA,https://consulting.com,https://linkedin.com/in/alicewilliams
