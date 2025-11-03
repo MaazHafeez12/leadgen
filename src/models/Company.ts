@@ -17,6 +17,25 @@ export interface ICompany extends Document {
     employeeCount?: number;
     lastEnriched?: Date;
   };
+  scrapedData?: {
+    description?: string;
+    about?: string;
+    industry?: string;
+    size?: string;
+    founded?: string;
+    headquarters?: string;
+    website?: string;
+    specialties?: string[];
+    socialLinks?: {
+      linkedin?: string;
+      twitter?: string;
+      facebook?: string;
+    };
+    headings?: string[];
+    lastScraped?: Date;
+    source?: string; // URL that was scraped
+    method?: 'cheerio' | 'playwright';
+  };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -41,6 +60,25 @@ const CompanySchema: Schema = new Schema(
       verified: { type: Boolean, default: false },
       employeeCount: { type: Number },
       lastEnriched: { type: Date },
+    },
+    scrapedData: {
+      description: { type: String },
+      about: { type: String },
+      industry: { type: String },
+      size: { type: String },
+      founded: { type: String },
+      headquarters: { type: String },
+      website: { type: String },
+      specialties: [{ type: String }],
+      socialLinks: {
+        linkedin: { type: String },
+        twitter: { type: String },
+        facebook: { type: String },
+      },
+      headings: [{ type: String }],
+      lastScraped: { type: Date },
+      source: { type: String },
+      method: { type: String, enum: ['cheerio', 'playwright'] },
     },
   },
   {
