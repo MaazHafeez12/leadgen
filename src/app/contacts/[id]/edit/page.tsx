@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
+import EmailEnrichment from '@/components/EmailEnrichment';
 
 interface Company {
   _id: string;
@@ -149,6 +150,42 @@ export default function EditContactPage() {
     });
   };
 
+  const handleEmailFound = (email: string) => {
+    setFormData({
+      ...formData,
+      email: email,
+    });
+  };
+
+  const handleEmailVerified = (verificationData: any) => {
+    // Store verification results in state or show success message
+    console.log('Email verified:', verificationData);
+  };
+
+  // Extract domain from company
+  const getCompanyDomain = (): string | undefined => {
+    if (!formData.company) return undefined;
+    
+    const selectedCompany = companies.find(c => c._id === formData.company);
+    if (!selectedCompany) return undefined;
+    
+    // Check if company has a website field
+    const companyData = selectedCompany as any;
+    if (companyData.website) {
+      try {
+        const url = new URL(companyData.website.startsWith('http') 
+          ? companyData.website 
+          : `https://${companyData.website}`);
+        return url.hostname.replace('www.', '');
+      } catch {
+        return undefined;
+      }
+    }
+    
+    // Fallback: use company name as domain (e.g., "Acme Corp" -> "acmecorp.com")
+    return `${selectedCompany.name.toLowerCase().replace(/\s+/g, '')}.com`;
+  };
+
   if (fetching) {
     return (
       <div className="flex items-center justify-center h-96">
@@ -227,7 +264,7 @@ export default function EditContactPage() {
             </div>
 
             {/* Email */}
-            <div>
+            <div className="sm:col-span-2">
               <label htmlFor="email" className="block text-sm font-medium text-gray-900">
                 Email <span className="text-red-500">*</span>
               </label>
@@ -239,6 +276,19 @@ export default function EditContactPage() {
                 value={formData.email}
                 onChange={handleChange}
                 className="mt-2 block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm"
+              />
+            </div>
+
+            {/* Email Enrichment - Hunter.io */}
+            <div className="sm:col-span-2">
+              <EmailEnrichment
+                firstName={formData.firstName}
+                lastName={formData.lastName}
+                domain={getCompanyDomain()}
+                currentEmail={formData.email}
+                contactId={params.id as string}
+                onEmailFound={handleEmailFound}
+                onEmailVerified={handleEmailVerified}
               />
             </div>
 

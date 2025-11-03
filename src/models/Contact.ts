@@ -17,8 +17,21 @@ export interface IContact extends Document {
   notes?: string;
   enrichmentData?: {
     verified: boolean;
-    score?: number;
+    verificationStatus?: 'valid' | 'invalid' | 'accept_all' | 'webmail' | 'disposable' | 'unknown';
+    verificationResult?: 'deliverable' | 'undeliverable' | 'risky' | 'unknown';
+    score?: number; // Hunter.io confidence/deliverability score (0-100)
+    emailType?: 'personal' | 'generic';
+    sources?: number; // Number of sources found by Hunter.io
     lastEnriched?: Date;
+    hunterData?: {
+      position?: string;
+      department?: string;
+      disposable?: boolean;
+      webmail?: boolean;
+      acceptAll?: boolean;
+      mxRecords?: boolean;
+      smtpCheck?: boolean;
+    };
   };
   createdAt: Date;
   updatedAt: Date;
@@ -50,8 +63,27 @@ const ContactSchema: Schema = new Schema(
     notes: { type: String },
     enrichmentData: {
       verified: { type: Boolean, default: false },
+      verificationStatus: { 
+        type: String, 
+        enum: ['valid', 'invalid', 'accept_all', 'webmail', 'disposable', 'unknown'] 
+      },
+      verificationResult: { 
+        type: String, 
+        enum: ['deliverable', 'undeliverable', 'risky', 'unknown'] 
+      },
       score: { type: Number },
+      emailType: { type: String, enum: ['personal', 'generic'] },
+      sources: { type: Number },
       lastEnriched: { type: Date },
+      hunterData: {
+        position: { type: String },
+        department: { type: String },
+        disposable: { type: Boolean },
+        webmail: { type: Boolean },
+        acceptAll: { type: Boolean },
+        mxRecords: { type: Boolean },
+        smtpCheck: { type: Boolean },
+      },
     },
   },
   {
